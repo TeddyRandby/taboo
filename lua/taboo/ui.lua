@@ -155,14 +155,16 @@ function M.hastabnr(taboo, tabnr)
   return not not tab
 end
 
+-- What is the best way to do these highlights?
+
 ---Setup the hl namespace at nsnr
 ---@param taboo TabooState
 ---@param nsnr number
 ---@diagnostic disable-next-line: unused-local
 function M.nssetup(taboo, nsnr)
   vim.api.nvim_set_hl(nsnr, 'TabooIcon', {})
-  vim.api.nvim_set_hl(nsnr, 'TabooActive', { fg = "Orange" })
-  vim.api.nvim_set_hl(nsnr, 'TabooInactive', { fg = "Cyan", blend = 50 })
+  vim.api.nvim_set_hl(nsnr, 'TabooActive', { link = "Float" })
+  vim.api.nvim_set_hl(nsnr, 'TabooInactive', { link = "Comment" })
 end
 
 ---Setup the window at 'winnr' as a Taboo window

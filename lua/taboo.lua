@@ -7,12 +7,14 @@ local config = {
   components = {
     "new",
     "lazygit",
-    "terminal",
+    "shell",
+    "dapui",
   },
   icons = {
-    new      = "+",
-    lazygit  = "",
-    terminal = "$",
+    new     = "+",
+    shell   = "$",
+    dapui   = "",
+    lazygit = "",
   },
   launchers = {
     new = function(taboo, tid)
@@ -23,30 +25,9 @@ local config = {
       })
       components.detatch(taboo, "new")
     end,
-    terminal = function()
-      vim.fn.termopen(vim.o.shell, {
-        on_exit = function()
-          vim.api.nvim_command [[ tabclose ]]
-        end,
-        on_stderr = function(_, data)
-          vim.notify_once(data, vim.log.levels.ERROR)
-        end,
-      })
-
-      vim.cmd [[ startinsert ]]
-    end,
-    lazygit = function()
-      vim.fn.termopen("lazygit", {
-        on_exit = function()
-          vim.api.nvim_command [[ tabclose ]]
-        end,
-        on_stderr = function(_, data)
-          vim.notify_once(data, vim.log.levels.ERROR)
-        end,
-      })
-
-      vim.cmd [[ startinsert ]]
-    end
+    dapui = function() require("dapui").open() end,
+    shell = module.launcher(vim.o.shell, { insert = true, term = true }),
+    lazygit = module.launcher("lazygit", { insert = true, term = true }),
   },
 }
 
@@ -65,7 +46,7 @@ local M = {
 ---@param args TabooConfig?
 -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
 -- you can also put some validation here for those.
-M.setup = function(args)
+function M.setup(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
 
   for _, v in ipairs(M.config.components) do
@@ -73,28 +54,32 @@ M.setup = function(args)
   end
 end
 
-M.open = function()
+function M.open()
   module.open(M)
 end
 
-M.close = function()
+function M.close()
   module.close(M)
 end
 
-M.next = function()
+function M.next()
   module.next(M)
 end
 
-M.prev = function()
+function M.prev()
   module.prev(M)
 end
 
-M.launch = function(target)
+function M.launch(target)
   module.launch(M, target)
 end
 
-M.remove = function(target)
+function M.remove(target)
   module.remove(M, target)
+end
+
+function M.focus()
+  module.focus(M)
 end
 
 return M

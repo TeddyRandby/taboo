@@ -4,7 +4,7 @@ local ui = require("taboo.ui")
 ---@class TabooStateInternal
 ---@field width integer
 local M = {
-  width = 6,
+  width = 5,
 }
 
 ---Render the taboo ui into its' buffer
@@ -132,6 +132,14 @@ function M.prev(taboo)
   M.select(taboo, taboo.selected - 1, true)
 end
 
+---Focus the taboo ui
+---@param taboo TabooState
+function M.focus(taboo)
+  if ui.haswinnr(taboo, 0) then
+    vim.api.nvim_set_current_win(ui.winnr(taboo, 0))
+  end
+end
+
 ---Append a component to the list.
 ---If successful, re-render the ui.
 ---@param cmp TabooAppend
@@ -147,12 +155,53 @@ end
 function M.remove(taboo, cmp)
   local result = components.remove(taboo, cmp)
   if result then
-    if #taboo.config.components == 0 then
+    if #components.components == 0 then
       M.close(taboo)
     end
 
     if result == taboo.selected then
       M.prev(taboo)
+    end
+  end
+end
+
+---@class TabooLauncherOptions
+---@field insert boolean?
+---@field term boolean?
+
+---@alias TabooLauncher function
+
+---Create a launcher for the given command
+---@param cmd string | function
+---@param opts TabooLauncherOptions?
+---@return TabooLauncher
+function M.launcher(cmd, opts)
+  opts = opts or {}
+
+  return function()
+    if type(cmd) == "function" then
+      cmd()
+    end
+
+    if type(cmd) == "string" then
+      if opts.term then
+        vim.fn.termopen(cmd, {
+          on_exit = function()
+            vim.api.nvim_command [[ tabclose ]]
+          end,
+          on_stderr = function(_, data)
+            vim.notify_once(data, vim.log.levels.ERROR)
+          end,
+        })
+      end
+
+      if not opts.term then
+        vim.api.nvim_command(cmd)
+      end
+    end
+
+    if opts.insert then
+      vim.cmd [[ startinsert ]]
     end
   end
 end
