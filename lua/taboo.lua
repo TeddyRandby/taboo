@@ -1,5 +1,6 @@
 -- main module file
 local module = require("taboo.module")
+local components = require("taboo.components")
 
 ---@class TabooConfig
 local config = {
@@ -13,13 +14,17 @@ local config = {
     lazygit  = "",
     terminal = "$",
   },
-  expanders = {
-    tabs = function()
-    end,
-  },
   launchers = {
+    new = function(taboo, tid)
+      module.append(taboo, {
+        name = tostring(tid),
+        icon = tid,
+        tabnr = tid,
+      })
+      components.detatch(taboo, "new")
+    end,
     terminal = function()
-      local jid = vim.fn.termopen("sh", {
+      vim.fn.termopen(vim.o.shell, {
         on_exit = function()
           vim.api.nvim_command [[ tabclose ]]
         end,
@@ -27,12 +32,11 @@ local config = {
           vim.notify_once(data, vim.log.levels.ERROR)
         end,
       })
-      assert(jid ~= 0, "Failed to open job")
 
       vim.cmd [[ startinsert ]]
     end,
     lazygit = function()
-      local jid = vim.fn.termopen("lazygit", {
+      vim.fn.termopen("lazygit", {
         on_exit = function()
           vim.api.nvim_command [[ tabclose ]]
         end,
@@ -40,7 +44,6 @@ local config = {
           vim.notify_once(data, vim.log.levels.ERROR)
         end,
       })
-      assert(jid ~= 0, "Failed to open job")
 
       vim.cmd [[ startinsert ]]
     end
@@ -48,15 +51,11 @@ local config = {
 }
 
 ---@class TabooState
----@field tabs { winnr: integer, cmp: string }[]
 ---@field bufnr integer
 ---@field nsnr integer
 ---@field selected integer
----@field components table[string]
----@field icons table[string, string]
 ---@field config TabooConfig
 local M = {
-  tabs = {},
   nsnr = -1,
   bufnr = -1,
   selected = 1,
@@ -68,6 +67,10 @@ local M = {
 -- you can also put some validation here for those.
 M.setup = function(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
+
+  for _, v in ipairs(M.config.components) do
+    components.append(M, { name = v })
+  end
 end
 
 M.open = function()
@@ -88,6 +91,10 @@ end
 
 M.launch = function(target)
   module.launch(M, target)
+end
+
+M.remove = function(target)
+  module.remove(M, target)
 end
 
 return M
