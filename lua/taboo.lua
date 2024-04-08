@@ -13,8 +13,8 @@ local config = {
   icons = {
     new     = "",
     shell   = "",
-    dapui   = "",
-    lazygit = "",
+    dapui   = "",
+    lazygit = "",
   },
   launchers = {
     new = function(taboo, tid)
