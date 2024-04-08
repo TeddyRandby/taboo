@@ -82,4 +82,8 @@ function M.focus()
   module.focus(M)
 end
 
+function M.launcher(cmd, opts)
+  module.launcher(cmd, opts)
+end
+
 return M
