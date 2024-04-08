@@ -85,10 +85,6 @@ function M.launch(taboo, target)
   assert(type(cmpnr) == "number", "Invalid target: Expected number, not " .. vim.inspect(cmpnr))
 
   components.launch(taboo, cmpnr)
-
-  M.open(taboo)
-
-  vim.api.nvim_command [[ wincmd l ]]
 end
 
 ---Select the component at index 'i'

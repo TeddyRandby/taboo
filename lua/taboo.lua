@@ -11,8 +11,8 @@ local config = {
     "dapui",
   },
   icons = {
-    new     = "+",
-    shell   = "$",
+    new     = "",
+    shell   = "",
     dapui   = "",
     lazygit = "",
   },
