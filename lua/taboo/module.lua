@@ -54,8 +54,9 @@ function M.open(taboo)
     ui.winsetup(taboo, ui.winnr(taboo, 0), ui.bufnr(taboo))
   end
 
+  vim.api.nvim_set_current_win(ui.winnr(taboo, 0))
   vim.api.nvim_command [[stopinsert]]
-  M.select(taboo, taboo.selected)
+  M.select(taboo, taboo.selected, true)
 end
 
 ---Close the taboo ui window
@@ -69,7 +70,7 @@ end
 
 ---Launch the target component
 ---@param taboo TabooState
----@param target number | string | nil
+---@param target string | integer | nil
 function M.launch(taboo, target)
   local cmpnr = target or taboo.selected
 
@@ -84,8 +85,14 @@ function M.launch(taboo, target)
 
   assert(type(cmpnr) == "number", "Invalid target: Expected number, not " .. vim.inspect(cmpnr))
 
-  components.launch(taboo, cmpnr)
+  components.launch(taboo, cmpnr, true)
+
+  -- M.open(taboo)
 end
+
+---@class TabooSelect
+---@field preview boolean?
+---@field launch boolean?
 
 ---Select the component at index 'i'
 ---This is 1-based, and will clamp to within the bounds of the component table.
@@ -111,21 +118,49 @@ function M.select(taboo, cmpnr, preview)
 
   M.render(taboo)
 
-  if preview and components.hastabnr(taboo, 0) then
-    components.launch(taboo, 0)
+  local tid = components.tabnr(taboo, 0)
+
+  if preview and ui.haswinnr(taboo, tid) and components.hastabnr(taboo, 0) then
+    components.launch(taboo, 0, false)
   end
 end
 
 ---Select the next component
 ---@param taboo TabooState
-function M.next(taboo)
-  M.select(taboo, taboo.selected + 1, ui.haswinnr(taboo, 0))
+---@param skip boolean?
+function M.next(taboo, skip)
+  M.select(taboo, taboo.selected + 1, true)
+
+  if skip then
+    local starting_point = taboo.selected
+
+    while not components.hastabnr(taboo, 0) do
+      M.select(taboo, taboo.selected + 1, true)
+
+      if taboo.selected == starting_point then
+        break
+      end
+    end
+  end
 end
 
 ---Select the previous component
 ---@param taboo TabooState
-function M.prev(taboo)
-  M.select(taboo, taboo.selected - 1, ui.haswinnr(taboo, 0))
+---@param skip boolean?
+function M.prev(taboo, skip)
+  M.select(taboo, taboo.selected - 1, true)
+
+  if skip then
+    local starting_point = taboo.selected
+
+    while not components.hastabnr(taboo, 0) do
+      M.select(taboo, taboo.selected - 1, true)
+
+      if taboo.selected == starting_point then
+        break
+      end
+    end
+  end
 end
 
 ---Focus the taboo ui
@@ -147,7 +182,7 @@ end
 
 ---Remove a component from the list.
 ---If successful, select the previous component.
----@param cmp string | number | nil
+---@param cmp string | integer | nil
 function M.remove(taboo, cmp)
   local result = components.remove(taboo, cmp)
   if result then
@@ -197,7 +232,8 @@ function M.launcher(cmd, opts)
     end
 
     if opts.insert then
-      vim.cmd [[ startinsert ]]
+      vim.api.nvim_command [[ wincmd l]]
+      vim.api.nvim_command [[ startinsert ]]
     end
   end
 end

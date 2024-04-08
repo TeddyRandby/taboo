@@ -43,9 +43,8 @@ local M = {
   config = config,
 }
 
+---Setup the plugin
 ---@param args TabooConfig?
--- you can define your setup function here. Usually configurations can be merged, accepting outside params and
--- you can also put some validation here for those.
 function M.setup(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
 
@@ -54,36 +53,51 @@ function M.setup(args)
   end
 end
 
+---Open the taboo ui
 function M.open()
   module.open(M)
 end
 
+---Close the taboo ui
 function M.close()
   module.close(M)
 end
 
-function M.next()
-  module.next(M)
+---Select the next tab
+---@param skip boolean?
+function M.next(skip)
+  module.next(M, skip)
 end
 
-function M.prev()
-  module.prev(M)
+---Select the previous tab
+---@param skip boolean?
+function M.prev(skip)
+  module.prev(M, skip)
 end
 
+---Launch the component at target, or the selected one
+---@param target string | integer | nil
 function M.launch(target)
   module.launch(M, target)
 end
 
+---Remove the component at target, or the selected one
+---@param target string | integer | nil
 function M.remove(target)
   module.remove(M, target)
 end
 
+---Focus the taboo ui window
 function M.focus()
   module.focus(M)
 end
 
+---Build a launcher for the given command
+---@param cmd string
+---@param opts TabooLauncherOptions?
+---@return TabooLauncher
 function M.launcher(cmd, opts)
-  module.launcher(cmd, opts)
+  return module.launcher(cmd, opts)
 end
 
 return M

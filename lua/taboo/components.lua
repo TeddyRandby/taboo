@@ -67,7 +67,7 @@ function M.tabnr(taboo, cmpnr, tabnr)
     cmpnr = taboo.selected
   end
 
-  assert(cmpnr > 0 and cmpnr <= #M.components, "No component found")
+  assert(cmpnr > 0 and cmpnr <= #M.components, "No component found: "..cmpnr)
 
   if not tabnr then
     local tid = M.tabpages[cmpnr]
@@ -99,10 +99,28 @@ function M.detatch(taboo, cmpnr)
   M.tabpages[cmpnr] = nil
 end
 
+---Focus the window initally launched with the component
+---@param taboo TabooState
+---@param cmpnr integer
+---@param enter boolean?
+---@return boolean
+function M.focus(taboo, cmpnr, enter)
+  if cmpnr == 0 then
+    cmpnr = taboo.selected
+  end
+
+  assert(cmpnr >= 0 and cmpnr <= #M.components, "Invalid target: Out of bounds. " .. vim.inspect(cmpnr))
+
+  local tid = M.tabnr(taboo, cmpnr)
+
+  return ui.focus(taboo, tid, enter and ui.haswinnr(taboo, tid))
+end
+
 ---Launch the component at the given cmpnr
 ---@param taboo TabooState
 ---@param cmpnr integer
-function M.launch(taboo, cmpnr)
+---@param enter boolean?
+function M.launch(taboo, cmpnr, enter)
   if cmpnr == 0 then
     cmpnr = taboo.selected
   end
@@ -111,7 +129,7 @@ function M.launch(taboo, cmpnr)
 
   local cmp = M.components[cmpnr]
 
-  local tid = M.tabnr(taboo, cmp)
+  local tid = M.tabnr(taboo, cmpnr)
 
   if not M.hastabnr(taboo, cmp) then
     local launcher = taboo.config.launchers[cmp]
@@ -119,10 +137,12 @@ function M.launch(taboo, cmpnr)
 
     vim.api.nvim_command [[ tabnew ]]
 
+    local wid = vim.api.nvim_get_current_win()
     tid = vim.api.nvim_get_current_tabpage()
 
     local tab = ui.tab(taboo, tid) or {}
     tab.cmp = cmp
+    tab.cmpwinnr = wid
     ui.tab(taboo, tid, tab)
 
     M.tabpages[cmpnr] = tid
@@ -130,7 +150,7 @@ function M.launch(taboo, cmpnr)
     launcher(taboo, tid)
   end
 
-  vim.api.nvim_set_current_tabpage(tid)
+  M.focus(taboo, cmpnr, enter)
 end
 
 ---Remove a component. This closes the associated tab, if it exists.

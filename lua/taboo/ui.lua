@@ -1,5 +1,6 @@
 ---@class TabooTab
 ---@field cmp string?
+---@field cmpwinnr integer?
 ---@field winnr integer?
 
 ---@class TabooUI
@@ -75,7 +76,7 @@ end
 ---@return integer
 function M.winnr(taboo, tabnr, winnr)
   if tabnr == 0 then
-    tabnr = vim.api.nvim_get_current_tabpage()
+    tabnr =  vim.api.nvim_get_current_tabpage()
   end
 
   if not winnr then
@@ -153,6 +154,27 @@ function M.hastabnr(taboo, tabnr)
   local tab = M.tab(taboo, tabnr)
 
   return not not tab
+end
+
+---Check if we have a tab for the given tabnr
+---@param taboo TabooState
+---@param tabnr integer
+---@param enter boolean?
+---@return boolean
+function M.focus(taboo, tabnr, enter)
+  local tab = M.tab(taboo, tabnr)
+
+  if not tab or tabnr < 0 then
+    return false
+  end
+
+  vim.api.nvim_set_current_tabpage(tabnr)
+
+  if enter then
+    vim.api.nvim_set_current_win(tab.cmpwinnr)
+  end
+
+  return true
 end
 
 -- What is the best way to do these highlights?
