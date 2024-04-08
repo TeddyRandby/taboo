@@ -45,10 +45,8 @@ function M.open(taboo)
   end
 
   if not ui.haswinnr(taboo) then
-    vim.api.nvim_command [[
-      vsp
-      wincmd H
-    ]]
+    vim.api.nvim_command(M.width .. "vsp")
+    vim.api.nvim_command "wincmd H"
 
     local wid = vim.api.nvim_get_current_win()
     assert(wid ~= 0, "Failed to create window")
@@ -58,7 +56,7 @@ function M.open(taboo)
   end
 
   vim.api.nvim_set_current_win(ui.winnr(taboo, 0))
-  vim.api.nvim_command [[stopinsert]]
+  vim.api.nvim_command "stopinsert"
   M.select(taboo, taboo.selected, true)
 end
 
