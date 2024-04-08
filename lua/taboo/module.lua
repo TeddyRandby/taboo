@@ -119,13 +119,13 @@ end
 ---Select the next component
 ---@param taboo TabooState
 function M.next(taboo)
-  M.select(taboo, taboo.selected + 1, true)
+  M.select(taboo, taboo.selected + 1, ui.haswinnr(taboo, 0))
 end
 
 ---Select the previous component
 ---@param taboo TabooState
 function M.prev(taboo)
-  M.select(taboo, taboo.selected - 1, true)
+  M.select(taboo, taboo.selected - 1, ui.haswinnr(taboo, 0))
 end
 
 ---Focus the taboo ui
