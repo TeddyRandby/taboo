@@ -45,13 +45,16 @@ function M.open(taboo)
   end
 
   if not ui.haswinnr(taboo) then
-    vim.api.nvim_command [[vsp]]
-    vim.api.nvim_command [[wincmd H]]
+    vim.api.nvim_command [[
+      vsp
+      wincmd H
+    ]]
+
     local wid = vim.api.nvim_get_current_win()
     assert(wid ~= 0, "Failed to create window")
 
     ui.winnr(taboo, 0, wid)
-    ui.winsetup(taboo, ui.winnr(taboo, 0), ui.bufnr(taboo))
+    ui.winsetup(taboo, wid, ui.bufnr(taboo))
   end
 
   vim.api.nvim_set_current_win(ui.winnr(taboo, 0))
@@ -110,15 +113,16 @@ function M.select(taboo, cmpnr, preview)
     taboo.selected = #components.components
   end
 
-  if ui.haswinnr(taboo) then
-    local row = taboo.selected * 3 - 1
-    local col = 4
-    vim.api.nvim_win_set_cursor(ui.winnr(taboo, 0), { row, col })
-  end
+  local tid = components.tabnr(taboo, 0)
+  local wid = ui.winnr(taboo, tid)
 
   M.render(taboo)
 
-  local tid = components.tabnr(taboo, 0)
+  if ui.haswinnr(taboo, tid) then
+    local row = taboo.selected * 3 - 1
+    local col = 4
+    vim.api.nvim_win_set_cursor(wid, { row, col })
+  end
 
   if preview and ui.haswinnr(taboo, tid) and components.hastabnr(taboo, 0) then
     components.launch(taboo, 0, false)
