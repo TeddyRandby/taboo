@@ -4,13 +4,24 @@ vim.api.nvim_create_user_command("TabooClose", require("taboo").close, {})
 
 vim.api.nvim_create_user_command("TabooFocus", require("taboo").focus, {})
 
+local function table_from_flags(list)
+  local result = {}
+  for _, v in ipairs(list) do
+    result[v] = true
+  end
+
+  return result
+end
+
 vim.api.nvim_create_user_command("TabooNext", function(args)
-  require("taboo").next(args.fargs[1] == "skip")
-end, { nargs = '?' })
+  local opts = table_from_flags(args.fargs)
+  require("taboo").next(opts.skip, opts)
+end, { nargs = '*' })
 
 vim.api.nvim_create_user_command("TabooPrev", function(args)
-  require("taboo").prev(args.fargs[1] == "skip")
-end, { nargs = '?' })
+  local opts = table_from_flags(args.fargs)
+  require("taboo").prev(opts.skip, opts)
+end, { nargs = '*' })
 
 vim.api.nvim_create_user_command("TabooLaunch", function(args)
   require("taboo").launch(args.fargs[1])

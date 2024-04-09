@@ -57,7 +57,7 @@ function M.open(taboo)
 
   vim.api.nvim_set_current_win(ui.winnr(taboo, 0))
   vim.api.nvim_command "stopinsert"
-  M.select(taboo, taboo.selected, true)
+  M.select(taboo, taboo.selected)
 end
 
 ---Close the taboo ui window
@@ -93,14 +93,16 @@ end
 
 ---@class TabooSelect
 ---@field preview boolean?
----@field launch boolean?
+---@field enter boolean?
 
 ---Select the component at index 'i'
 ---This is 1-based, and will clamp to within the bounds of the component table.
 ---@param taboo TabooState
 ---@param cmpnr integer
----@param preview boolean?
-function M.select(taboo, cmpnr, preview)
+---@param opts TabooSelect?
+function M.select(taboo, cmpnr, opts)
+  opts = opts or {}
+
   taboo.selected = cmpnr
 
   if taboo.selected > #components.components then
@@ -122,22 +124,27 @@ function M.select(taboo, cmpnr, preview)
     vim.api.nvim_win_set_cursor(wid, { row, col })
   end
 
-  if preview and ui.haswinnr(taboo, tid) and components.hastabnr(taboo, 0) then
-    components.launch(taboo, 0, false)
+  local show = opts.enter or (opts.preview and ui.haswinnr(taboo, tid))
+
+  if show and components.hastabnr(taboo, 0) then
+    print(vim.inspect(opts.enter))
+    components.launch(taboo, 0, opts.enter)
+    M.render(taboo)
   end
 end
 
 ---Select the next component
 ---@param taboo TabooState
 ---@param skip boolean?
-function M.next(taboo, skip)
-  M.select(taboo, taboo.selected + 1, true)
+---@param opts TabooSelect?
+function M.next(taboo, skip, opts)
+  M.select(taboo, taboo.selected + 1, opts)
 
   if skip then
     local starting_point = taboo.selected
 
     while not components.hastabnr(taboo, 0) do
-      M.select(taboo, taboo.selected + 1, true)
+      M.select(taboo, taboo.selected + 1, opts)
 
       if taboo.selected == starting_point then
         break
@@ -149,14 +156,15 @@ end
 ---Select the previous component
 ---@param taboo TabooState
 ---@param skip boolean?
-function M.prev(taboo, skip)
-  M.select(taboo, taboo.selected - 1, true)
+---@param opts TabooSelect?
+function M.prev(taboo, skip, opts)
+  M.select(taboo, taboo.selected - 1, opts)
 
   if skip then
     local starting_point = taboo.selected
 
     while not components.hastabnr(taboo, 0) do
-      M.select(taboo, taboo.selected - 1, true)
+      M.select(taboo, taboo.selected - 1, opts)
 
       if taboo.selected == starting_point then
         break
@@ -220,7 +228,10 @@ function M.launcher(cmd, opts)
       if opts.term then
         vim.fn.termopen(cmd, {
           on_exit = function()
-            vim.api.nvim_command [[ tabclose ]]
+            vim.api.nvim_command [[
+              bdelete
+              tabclose
+            ]]
           end,
           on_stderr = function(_, data)
             vim.notify_once(data, vim.log.levels.ERROR)

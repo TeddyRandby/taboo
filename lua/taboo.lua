@@ -65,14 +65,16 @@ end
 
 ---Select the next tab
 ---@param skip boolean?
-function M.next(skip)
-  module.next(M, skip)
+---@param opts TabooSelect?
+function M.next(skip, opts)
+  module.next(M, skip, opts)
 end
 
 ---Select the previous tab
 ---@param skip boolean?
-function M.prev(skip)
-  module.prev(M, skip)
+---@param opts TabooSelect?
+function M.prev(skip, opts)
+  module.prev(M, skip, opts)
 end
 
 ---Launch the component at target, or the selected one

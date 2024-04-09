@@ -67,7 +67,7 @@ function M.tabnr(taboo, cmpnr, tabnr)
     cmpnr = taboo.selected
   end
 
-  assert(cmpnr > 0 and cmpnr <= #M.components, "No component found: "..cmpnr)
+  assert(cmpnr > 0 and cmpnr <= #M.components, "No component found: " .. cmpnr)
 
   if not tabnr then
     local tid = M.tabpages[cmpnr]
