@@ -87,8 +87,6 @@ function M.launch(taboo, target)
   assert(type(cmpnr) == "number", "Invalid target: Expected number, not " .. vim.inspect(cmpnr))
 
   components.launch(taboo, cmpnr, true)
-
-  -- M.open(taboo)
 end
 
 ---@class TabooSelect
@@ -127,7 +125,6 @@ function M.select(taboo, cmpnr, opts)
   local show = opts.enter or (opts.preview and ui.haswinnr(taboo, tid))
 
   if show and components.hastabnr(taboo, 0) then
-    print(vim.inspect(opts.enter))
     components.launch(taboo, 0, opts.enter)
     M.render(taboo)
   end
