@@ -49,7 +49,6 @@ function M.open(taboo)
     vim.api.nvim_command "wincmd H"
 
     local wid = vim.api.nvim_get_current_win()
-    assert(wid ~= 0, "Failed to create window")
 
     ui.winnr(taboo, 0, wid)
     ui.winsetup(taboo, wid, ui.bufnr(taboo))

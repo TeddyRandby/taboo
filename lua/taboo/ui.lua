@@ -21,6 +21,9 @@ local M = {
   },
   bufopts = {
     buflisted = false,
+    bufhidden = "wipe",
+    buftype = "nofile",
+    swapfile = false,
   },
   winopts = {
     relativenumber = false,
@@ -76,7 +79,7 @@ end
 ---@return integer
 function M.winnr(taboo, tabnr, winnr)
   if tabnr == 0 then
-    tabnr =  vim.api.nvim_get_current_tabpage()
+    tabnr = vim.api.nvim_get_current_tabpage()
   end
 
   if not winnr then
@@ -202,12 +205,13 @@ function M.winsetup(taboo, winnr, bufnr)
     return
   end
 
+  vim.api.nvim_win_set_buf(winnr, bufnr)
+
   for k, v in pairs(M.winopts) do
-    vim.api.nvim_win_set_option(winnr, k, v)
+    vim.opt_local[k] = v
   end
 
   vim.api.nvim_win_set_hl_ns(winnr, taboo.nsnr)
-  vim.api.nvim_win_set_buf(winnr, bufnr)
 end
 
 ---Toggle the cursor on and off. Requires "guicursor=a:Cursor/lCursor"
@@ -231,7 +235,9 @@ function M.bufsetup(taboo, bufnr)
   vim.api.nvim_buf_set_name(bufnr, "taboo" .. tostring(bufnr))
 
   for k, v in pairs(M.bufopts) do
-    vim.api.nvim_buf_set_option(bufnr, k, v)
+    vim.api.nvim_set_option_value(k, v, {
+      buf = bufnr,
+    })
   end
 
   for k, v in pairs(M.bufremaps) do
