@@ -44,7 +44,7 @@ end
 ---@param target string
 ---@return integer
 function M.find(taboo, target)
-  for i, k in pairs(M.components) do
+  for i, k in ipairs(M.components) do
     if k == target then
       return i
     end
@@ -131,7 +131,7 @@ function M.launch(taboo, cmpnr, enter)
 
   local tid = M.tabnr(taboo, cmpnr)
 
-  if not M.hastabnr(taboo, cmp) then
+  if not M.hastabnr(taboo, cmpnr) then
     local launcher = taboo.config.launchers[cmp]
     assert(launcher, "No launcher found for " .. cmp)
 
@@ -178,11 +178,10 @@ function M.remove(taboo, cmpnr)
     ui.tab(taboo, tid, {})
 
     vim.api.nvim_command("tabclose " .. vim.api.nvim_tabpage_get_number(tid))
-    M.tabnr(taboo, cmpnr, -1)
   end
 
-  table.remove(M.tabpages, cmpnr)
   table.remove(M.components, cmpnr)
+  table.remove(M.tabpages, cmpnr)
 
   return cmpnr
 end
@@ -213,6 +212,7 @@ function M.append(taboo, cmp)
   end
 
   table.insert(M.components, cmp.name)
+  table.insert(M.tabpages, -1)
   cmpnr = #M.components
 
   if cmp.tabnr then
