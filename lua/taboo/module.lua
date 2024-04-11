@@ -229,6 +229,11 @@ function M.launcher(taboo, cmd, opts)
 
     if type(cmd) == "string" then
       if opts.term then
+        vim.api.nvim_command [[
+          set signcolumn=no
+          set number=no
+        ]]
+
         vim.fn.termopen(cmd, {
           on_exit = function()
             components.detatch(taboo, 0)
