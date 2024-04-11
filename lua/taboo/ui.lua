@@ -5,9 +5,9 @@
 
 ---@class TabooUI
 ---@field tabs TabooTab[]
----@field bufremaps table[string, string]
----@field bufopts table[string, string]
----@field winopts table[string, string]
+---@field bufremaps table<string, string>
+---@field bufopts table<string, string | boolean>
+---@field winopts table<string, string | boolean>
 local M = {
   tabs = {},
   bufremaps = {

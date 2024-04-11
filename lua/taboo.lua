@@ -14,6 +14,9 @@ local M = {
 }
 
 ---@class TabooConfig
+---@field components string[]
+---@field icons table<string,string>
+---@field launchers table<string, TabooLauncher>
 local config = {
   components = {
     "new",
@@ -31,7 +34,7 @@ local config = {
     new = function(taboo, tid)
       module.append(taboo, {
         name = tostring(tid),
-        icon = tid,
+        icon = tostring(tid),
         tabnr = tid,
       })
       components.detatch(taboo, "new")

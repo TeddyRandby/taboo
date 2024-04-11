@@ -43,6 +43,7 @@ end
 ---@param taboo TabooState
 ---@param target string
 ---@return integer
+---@diagnostic disable-next-line: unused-local
 function M.find(taboo, target)
   for i, k in ipairs(M.components) do
     if k == target then
@@ -153,7 +154,7 @@ function M.launch(taboo, cmpnr, enter)
 
     M.tabpages[cmpnr] = tid
 
-    launcher(taboo, tid)
+    launcher(taboo, tid, tab)
   end
 
   M.focus(taboo, cmpnr, enter)

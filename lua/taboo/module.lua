@@ -212,7 +212,7 @@ end
 ---@field insert boolean?
 ---@field term boolean?
 
----@alias TabooLauncher function
+---@alias TabooLauncher fun(taboo: TabooState, tid: integer, tab: TabooTab)
 
 ---Create a launcher for the given command
 ---@param taboo TabooState
@@ -222,17 +222,19 @@ end
 function M.launcher(taboo, cmd, opts)
   opts = opts or {}
 
-  return function()
+  return function(_, _, tab)
     if type(cmd) == "function" then
       cmd()
     end
 
     if type(cmd) == "string" then
       if opts.term then
-        vim.api.nvim_command [[
-          set signcolumn=no
-          set number=no
-        ]]
+        if tab.cmpwinnr then
+          local set_opts = { win = tab.cmpwinnr, scope = "local" }
+          vim.api.nvim_set_option_value("signcolumn", "no", set_opts)
+          vim.api.nvim_set_option_value("relativenumber", false, set_opts)
+          vim.api.nvim_set_option_value("number", false, set_opts)
+        end
 
         vim.fn.termopen(cmd, {
           on_exit = function()
