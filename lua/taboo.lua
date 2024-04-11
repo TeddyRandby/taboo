@@ -2,6 +2,17 @@
 local module = require("taboo.module")
 local components = require("taboo.components")
 
+---@class TabooState
+---@field bufnr integer
+---@field nsnr integer
+---@field selected integer
+---@field config TabooConfig
+local M = {
+  nsnr = -1,
+  bufnr = -1,
+  selected = 1,
+}
+
 ---@class TabooConfig
 local config = {
   components = {
@@ -26,22 +37,13 @@ local config = {
       components.detatch(taboo, "new")
     end,
     dapui = function() require("dapui").open() end,
-    shell = module.launcher(vim.o.shell, { insert = true, term = true }),
-    lazygit = module.launcher("lazygit", { insert = true, term = true }),
+    shell = module.launcher(M ,vim.o.shell, { insert = true, term = true }),
+    lazygit = module.launcher(M, "lazygit", { insert = true, term = true }),
   },
 }
 
----@class TabooState
----@field bufnr integer
----@field nsnr integer
----@field selected integer
----@field config TabooConfig
-local M = {
-  nsnr = -1,
-  bufnr = -1,
-  selected = 1,
-  config = config,
-}
+M.config = config
+
 
 ---Setup the plugin
 ---@param args TabooConfig?
@@ -99,7 +101,7 @@ end
 ---@param opts TabooLauncherOptions?
 ---@return TabooLauncher
 function M.launcher(cmd, opts)
-  return module.launcher(cmd, opts)
+  return module.launcher(M, cmd, opts)
 end
 
 return M

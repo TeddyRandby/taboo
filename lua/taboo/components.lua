@@ -82,21 +82,27 @@ end
 
 ---Return true if the given component has an associated active tab
 ---@param taboo TabooState
----@param cmpnr string | integer
+---@param cmp string | integer
 ---@return boolean
-function M.hastabnr(taboo, cmpnr)
-  return vim.api.nvim_tabpage_is_valid(M.tabnr(taboo, cmpnr))
+function M.hastabnr(taboo, cmp)
+  return vim.api.nvim_tabpage_is_valid(M.tabnr(taboo, cmp))
 end
 
 ---Detatch a component from its tab, but leave the tab open
 ---@param taboo TabooState
----@param cmpnr string | integer
-function M.detatch(taboo, cmpnr)
-  if type(cmpnr) == "string" then
-    cmpnr = M.find(taboo, cmpnr)
+---@param cmp string | integer | nil
+function M.detatch(taboo, cmp)
+  if cmp == nil then
+    cmp = 0
   end
 
-  M.tabpages[cmpnr] = nil
+  if type(cmp) == "string" then
+    cmp = M.find(taboo, cmp)
+  end
+
+  assert(cmp > 0 and cmp <= #M.components, "No component found: " .. cmp)
+
+  M.tabpages[cmp] = -1
 end
 
 ---Focus the window initally launched with the component

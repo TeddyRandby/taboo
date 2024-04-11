@@ -186,6 +186,12 @@ function M.append(taboo, cmp)
   end
 end
 
+---Detatch a component from it's tab.
+---@param cmp string | integer | nil
+function M.detatch(taboo, cmp)
+  components.detatch(taboo, cmp)
+end
+
 ---Remove a component from the list.
 ---If successful, select the previous component.
 ---@param cmp string | integer | nil
@@ -197,7 +203,7 @@ function M.remove(taboo, cmp)
     end
 
     if result == taboo.selected then
-      M.prev(taboo)
+      M.prev(taboo, true, { enter = true })
     end
   end
 end
@@ -209,10 +215,11 @@ end
 ---@alias TabooLauncher function
 
 ---Create a launcher for the given command
+---@param taboo TabooState
 ---@param cmd string | function
 ---@param opts TabooLauncherOptions?
 ---@return TabooLauncher
-function M.launcher(cmd, opts)
+function M.launcher(taboo, cmd, opts)
   opts = opts or {}
 
   return function()
@@ -224,6 +231,8 @@ function M.launcher(cmd, opts)
       if opts.term then
         vim.fn.termopen(cmd, {
           on_exit = function()
+            components.detatch(taboo, 0)
+
             vim.api.nvim_command [[
               bdelete
               tabclose
