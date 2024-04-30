@@ -242,9 +242,14 @@ function M.launcher(taboo, cmd, opts)
         vim.fn.termopen(cmd, {
           on_exit = function()
             components.detatch(taboo, 0)
+
+            vim.api.nvim_command [[
+              bdelete!
+              tabclose!
+            ]]
           end,
           on_stderr = function(_, data)
-            vim.notify(data, vim.log.levels.ERROR)
+            vim.notify_once(data, vim.log.levels.ERROR)
           end,
         })
       end

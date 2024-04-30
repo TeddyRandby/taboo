@@ -23,6 +23,7 @@ local M = {
     bufhidden = "wipe",
     buftype = "nofile",
     swapfile = false,
+    filetype = "taboo",
   },
   winopts = {
     relativenumber = false,
