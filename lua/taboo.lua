@@ -37,6 +37,7 @@ local config = {
         icon = tostring(tid),
         tabnr = tid,
       })
+
       components.detatch(taboo, "new")
     end,
     dapui = function() require("dapui").open() end,
@@ -97,6 +98,11 @@ end
 ---Focus the taboo ui window
 function M.focus()
   module.focus(M)
+end
+
+---Toggle the taboo ui window
+function M.toggle()
+  module.toggle(M)
 end
 
 ---Build a launcher for the given command

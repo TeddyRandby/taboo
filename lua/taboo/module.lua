@@ -25,6 +25,16 @@ function M.render(taboo)
   end
 end
 
+---Toggle the taboo ui window
+---@param taboo TabooState
+function M.toggle(taboo)
+  if ui.haswinnr(taboo) then
+    M.close(taboo)
+  else
+    M.open(taboo)
+  end
+end
+
 ---Open the taboo ui window
 ---@param taboo TabooState
 function M.open(taboo)
@@ -111,15 +121,10 @@ function M.select(taboo, cmpnr, opts)
   end
 
   local tid = components.tabnr(taboo, 0)
-  local wid = ui.winnr(taboo, tid)
 
   M.render(taboo)
 
-  if ui.haswinnr(taboo, tid) then
-    local row = taboo.selected * 3 - 1
-    local col = 4
-    vim.api.nvim_win_set_cursor(wid, { row, col })
-  end
+  M.focus(taboo)
 
   local show = opts.enter or (opts.preview and ui.haswinnr(taboo, tid))
 
@@ -222,19 +227,17 @@ end
 function M.launcher(taboo, cmd, opts)
   opts = opts or {}
 
-  return function(_, _, tab)
+  return function()
     if type(cmd) == "function" then
       cmd()
     end
 
     if type(cmd) == "string" then
       if opts.term then
-        if tab.cmpwinnr then
-          local set_opts = { win = tab.cmpwinnr, scope = "local" }
-          vim.api.nvim_set_option_value("signcolumn", "no", set_opts)
-          vim.api.nvim_set_option_value("relativenumber", false, set_opts)
-          vim.api.nvim_set_option_value("number", false, set_opts)
-        end
+        local set_opts = { win = 0, scope = "local" }
+        vim.api.nvim_set_option_value("signcolumn", "no", set_opts)
+        vim.api.nvim_set_option_value("relativenumber", false, set_opts)
+        vim.api.nvim_set_option_value("number", false, set_opts)
 
         vim.fn.termopen(cmd, {
           on_exit = function()

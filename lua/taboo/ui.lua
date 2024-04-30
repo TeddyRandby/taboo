@@ -1,6 +1,5 @@
 ---@class TabooTab
 ---@field cmp string?
----@field cmpwinnr integer?
 ---@field winnr integer?
 
 ---@class TabooUI
@@ -132,6 +131,7 @@ function M.haswinnr(taboo, tabnr)
   return vim.api.nvim_win_is_valid(tab.winnr)
 end
 
+
 ---Return true if Taboo has a valid namespace
 ---@param taboo TabooState
 ---@return boolean
@@ -174,7 +174,7 @@ function M.focus(taboo, tabnr, enter)
   vim.api.nvim_set_current_tabpage(tabnr)
 
   if enter then
-    vim.api.nvim_set_current_win(tab.cmpwinnr)
+    vim.api.nvim_command [[ wincmd l ]]
   end
 
   return true

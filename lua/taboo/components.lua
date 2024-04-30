@@ -140,16 +140,18 @@ function M.launch(taboo, cmpnr, enter)
 
   if not M.hastabnr(taboo, cmpnr) then
     local launcher = taboo.config.launchers[cmp]
-    assert(launcher, "No launcher found for " .. cmp)
+
+    if not launcher then
+      vim.notify("No launcher found for " .. cmp, vim.log.levels.WARN)
+      return
+    end
 
     vim.api.nvim_command [[ tabnew ]]
 
-    local wid = vim.api.nvim_get_current_win()
     tid = vim.api.nvim_get_current_tabpage()
 
     local tab = ui.tab(taboo, tid) or {}
     tab.cmp = cmp
-    tab.cmpwinnr = wid
     ui.tab(taboo, tid, tab)
 
     M.tabpages[cmpnr] = tid

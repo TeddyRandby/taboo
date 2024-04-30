@@ -4,6 +4,8 @@ vim.api.nvim_create_user_command("TabooClose", require("taboo").close, {})
 
 vim.api.nvim_create_user_command("TabooFocus", require("taboo").focus, {})
 
+vim.api.nvim_create_user_command("TabooToggle", require("taboo").toggle, {})
+
 local function table_from_flags(list)
   local result = {}
   for _, v in ipairs(list) do
