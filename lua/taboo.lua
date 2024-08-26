@@ -13,9 +13,13 @@ local M = {
   selected = 1,
 }
 
+---@class TabooComponentSettings
+---@field keep_on_close boolean
+
 ---@class TabooConfig
 ---@field components string[]
 ---@field icons table<string,string>
+---@field settings table<string, TabooComponentSettings>
 ---@field launchers table<string, TabooLauncher>
 local config = {
   components = {
@@ -29,6 +33,12 @@ local config = {
     shell   = "",
     dapui   = "",
     lazygit = "",
+  },
+  settings = {
+    new = { keep_on_close = true },
+    shell = { keep_on_close = true },
+    dapui = { keep_on_close = true },
+    lazygit = { keep_on_close = true },
   },
   launchers = {
     new = function(taboo, tid)
@@ -48,6 +58,22 @@ local config = {
 
 M.config = config
 
+local autocmds = {
+  {
+    "TabClosed",
+    function(args)
+      print(vim.inspect(args))
+      local tabnr = tonumber(vim.fn.expand("<afile>"))
+      local cmpnr = module.find_tab(M, tabnr)
+      print(type(tabnr), tabnr, type(cmpnr), cmpnr)
+      module.detatch(M, cmpnr)
+      if not M.setting(M, "keep_on_close", cmpnr) then
+        module.remove(M, cmpnr)
+      end
+    end,
+  },
+}
+
 
 ---Setup the plugin
 ---@param args TabooConfig?
@@ -57,6 +83,24 @@ function M.setup(args)
   for _, v in ipairs(M.config.components) do
     components.append(M, { name = v })
   end
+
+  for _, v in ipairs(autocmds) do
+    vim.api.nvim_create_autocmd(v[1], {
+      callback = v[2],
+    })
+  end
+end
+
+---Get a given setting for the given component
+---@param taboo TabooState
+---@param setting string
+---@param cmpnr string | integer | nil
+---@return any
+function M.setting(taboo, setting, cmpnr)
+  local component = components.component(taboo, cmpnr)
+  local settings = taboo.config.settings[component] or {}
+  print(component, vim.inspect(settings))
+  return settings[setting]
 end
 
 ---Open the taboo ui

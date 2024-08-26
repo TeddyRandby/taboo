@@ -39,7 +39,7 @@ function M.render(taboo, cmpnr)
   vim.api.nvim_buf_add_highlight(ui.bufnr(taboo), taboo.nsnr, "TabooIcon", start + 1, 4, 5)
 end
 
----Find the cmpnr of the given component
+---Find the cmpnr of a given component
 ---@param taboo TabooState
 ---@param target string
 ---@return integer
@@ -52,6 +52,39 @@ function M.find(taboo, target)
   end
 
   return -1
+end
+
+---Find the cmpnr at a given tab
+---@param taboo TabooState
+---@param tabnr integer
+---@return integer
+---@diagnostic disable-next-line: unused-local
+function M.find_tab(taboo, tabnr)
+  for k, v in ipairs(M.tabpages) do
+    if v == tabnr then
+      return k
+    end
+  end
+
+  return -1
+end
+
+---Get the tabpage corresponding to the component cmpnr
+---@param taboo TabooState
+---@param cmp string | integer | nil
+---@return string
+function M.component(taboo, cmp)
+  if type(cmp) == "string" then
+    return cmp
+  end
+
+  if not cmp or cmp == 0 then
+    cmp = taboo.selected
+  end
+
+  assert(cmp > 0 and cmp <= #M.components, "No component found: " .. cmp)
+
+  return M.components[cmp]
 end
 
 ---Get the tabpage corresponding to the component cmpnr
@@ -165,13 +198,13 @@ end
 ---Remove a component. This closes the associated tab, if it exists.
 ---@param taboo TabooState
 ---@param cmpnr string | number | nil
----@return integer | false
+---@return integer
 function M.remove(taboo, cmpnr)
   if type(cmpnr) == "string" then
     cmpnr = M.find(taboo, cmpnr)
 
     if cmpnr == -1 then
-      return false
+      return -1
     end
   end
 

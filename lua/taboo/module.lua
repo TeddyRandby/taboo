@@ -136,6 +136,18 @@ end
 
 ---Select the next component
 ---@param taboo TabooState
+---@param tabnr integer?
+---@return integer
+function M.find_tab(taboo, tabnr)
+  if not tabnr then
+    return -1
+  end
+
+  return components.find_tab(taboo, tabnr)
+end
+
+---Select the next component
+---@param taboo TabooState
 ---@param skip boolean?
 ---@param opts TabooSelect?
 function M.next(taboo, skip, opts)
@@ -211,6 +223,8 @@ function M.remove(taboo, cmp)
       M.prev(taboo, true, { enter = true })
     end
   end
+
+  M.render(taboo)
 end
 
 ---@class TabooLauncherOptions
