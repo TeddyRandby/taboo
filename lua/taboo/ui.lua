@@ -163,9 +163,10 @@ end
 ---Check if we have a tab for the given tabnr
 ---@param taboo TabooState
 ---@param tabnr integer
----@param enter boolean?
+---@param enter? boolean
+---@param insert? boolean
 ---@return boolean
-function M.focus(taboo, tabnr, enter)
+function M.focus(taboo, tabnr, enter, insert)
   local tab = M.tab(taboo, tabnr)
 
   if not tab or tabnr < 0 then
@@ -176,6 +177,10 @@ function M.focus(taboo, tabnr, enter)
 
   if enter then
     vim.api.nvim_command [[ wincmd l ]]
+
+    if insert then
+      vim.api.nvim_command [[ startinsert ]]
+    end
   end
 
   return true
@@ -191,6 +196,7 @@ function M.nssetup(taboo, nsnr)
   vim.api.nvim_set_hl(nsnr, 'TabooIcon', {})
   vim.api.nvim_set_hl(nsnr, 'TabooActive', { link = "Float" })
   vim.api.nvim_set_hl(nsnr, 'TabooInactive', { link = "Comment" })
+  vim.api.nvim_set_hl(nsnr, 'TabooTop', { link = "Cursor" })
 end
 
 ---Setup the window at 'winnr' as a Taboo window
@@ -213,15 +219,6 @@ function M.winsetup(taboo, winnr, bufnr)
   end
 
   vim.api.nvim_win_set_hl_ns(winnr, taboo.nsnr)
-end
-
----Toggle the cursor on and off. Requires "guicursor=a:Cursor/lCursor"
----@param target "on" | "off"
-function M.togglecursor(target)
-  local hl = vim.api.nvim_get_hl(0, { name = "Cursor" })
-  local next_blend = target == 'on' and 0 or 100
-  hl.blend = next_blend
-  vim.api.nvim_set_hl(0, 'Cursor', hl)
 end
 
 ---Setup the buffer at 'bufnr' as a Taboo buffer
@@ -252,20 +249,6 @@ function M.bufsetup(taboo, bufnr)
   end
 
   vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
-
-  vim.api.nvim_create_autocmd({ "BufLeave" }, {
-    buffer = bufnr,
-    callback = function()
-      M.togglecursor("on")
-    end,
-  })
-
-  vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    buffer = bufnr,
-    callback = function()
-      M.togglecursor("off")
-    end,
-  })
 end
 
 return M

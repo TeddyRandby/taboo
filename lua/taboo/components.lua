@@ -139,12 +139,24 @@ function M.detatch(taboo, cmp)
   M.tabpages[cmp] = -1
 end
 
+---Get a given setting for the given component
+---@param taboo TabooState
+---@param setting string
+---@param cmpnr string | integer | nil
+---@return any
+function M.setting(taboo, setting, cmpnr)
+  local component = M.component(taboo, cmpnr)
+  local settings = taboo.config.settings[component] or {}
+  return settings[setting]
+end
+
+
 ---Focus the window initally launched with the component
 ---@param taboo TabooState
 ---@param cmpnr integer
----@param enter boolean?
+---@param preview? boolean
 ---@return boolean
-function M.focus(taboo, cmpnr, enter)
+function M.focus(taboo, cmpnr, preview)
   if cmpnr == 0 then
     cmpnr = taboo.selected
   end
@@ -153,14 +165,16 @@ function M.focus(taboo, cmpnr, enter)
 
   local tid = M.tabnr(taboo, cmpnr)
 
-  return ui.focus(taboo, tid, enter and ui.haswinnr(taboo, tid))
+  local insert = M.setting(taboo, "insert", cmpnr)
+
+  return ui.focus(taboo, tid, not preview, insert)
 end
 
 ---Launch the component at the given cmpnr
 ---@param taboo TabooState
 ---@param cmpnr integer
----@param enter boolean?
-function M.launch(taboo, cmpnr, enter)
+---@param preview? boolean
+function M.launch(taboo, cmpnr, preview)
   if cmpnr == 0 then
     cmpnr = taboo.selected
   end
@@ -169,7 +183,7 @@ function M.launch(taboo, cmpnr, enter)
 
   local cmp = M.components[cmpnr]
 
-  local tid = M.tabnr(taboo, cmpnr)
+  local tabnr = M.tabnr(taboo, cmpnr)
 
   if not M.hastabnr(taboo, cmpnr) then
     local launcher = taboo.config.launchers[cmp]
@@ -181,18 +195,16 @@ function M.launch(taboo, cmpnr, enter)
 
     vim.api.nvim_command [[ tabnew ]]
 
-    tid = vim.api.nvim_get_current_tabpage()
+    tabnr = vim.api.nvim_get_current_tabpage()
 
-    local tab = ui.tab(taboo, tid) or {}
+    local tab = ui.tab(taboo, tabnr) or {}
     tab.cmp = cmp
-    ui.tab(taboo, tid, tab)
+    ui.tab(taboo, tabnr, tab)
 
-    M.tabpages[cmpnr] = tid
+    M.tabpages[cmpnr] = tabnr
 
-    launcher(taboo, tid, tab)
+    launcher(taboo, tabnr, tab)
   end
-
-  M.focus(taboo, cmpnr, enter)
 end
 
 ---Remove a component. This closes the associated tab, if it exists.

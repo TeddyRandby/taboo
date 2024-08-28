@@ -18,11 +18,13 @@ function M.render(taboo)
 
   vim.api.nvim_buf_clear_namespace(ui.bufnr(taboo), taboo.nsnr, 0, -1)
 
-  vim.api.nvim_buf_set_lines(ui.bufnr(taboo), 0, -1, false, {})
+  vim.api.nvim_buf_set_lines(ui.bufnr(taboo), 0, -1, false, {"     "})
+  vim.api.nvim_buf_add_highlight(ui.bufnr(taboo), taboo.nsnr, "TabooTop", 0, 0, -1)
 
   for i, _ in ipairs(components.components) do
     components.render(taboo, i)
   end
+
 end
 
 ---Toggle the taboo ui window
@@ -95,7 +97,11 @@ function M.launch(taboo, target)
 
   assert(type(cmpnr) == "number", "Invalid target: Expected number, not " .. vim.inspect(cmpnr))
 
-  components.launch(taboo, cmpnr, true)
+  components.launch(taboo, cmpnr)
+
+  M.open(taboo)
+
+  components.focus(taboo, cmpnr)
 end
 
 ---@class TabooSelect
@@ -110,27 +116,26 @@ end
 function M.select(taboo, cmpnr, opts)
   opts = opts or {}
 
+  if cmpnr > #components.components then
+    cmpnr = 1
+  end
+
+  if cmpnr < 1 then
+    cmpnr = #components.components
+  end
+
+  local enter = taboo.selected == cmpnr
+
   taboo.selected = cmpnr
-
-  if taboo.selected > #components.components then
-    taboo.selected = 1
-  end
-
-  if taboo.selected < 1 then
-    taboo.selected = #components.components
-  end
 
   local tid = components.tabnr(taboo, 0)
 
   M.render(taboo)
-
   M.focus(taboo)
 
-  local show = opts.enter or (opts.preview and ui.haswinnr(taboo, tid))
-
-  if show and components.hastabnr(taboo, 0) then
-    components.launch(taboo, 0, opts.enter)
-    M.render(taboo)
+  if opts.preview and components.hastabnr(taboo, 0) and ui.haswinnr(taboo, tid) then
+    components.launch(taboo, 0, not (opts.enter or enter))
+    components.focus(taboo, cmpnr, true)
   end
 end
 
@@ -228,7 +233,6 @@ function M.remove(taboo, cmp)
 end
 
 ---@class TabooLauncherOptions
----@field insert boolean?
 ---@field term boolean?
 
 ---@alias TabooLauncher fun(taboo: TabooState, tid: integer, tab: TabooTab)
@@ -271,11 +275,6 @@ function M.launcher(taboo, cmd, opts)
       if not opts.term then
         vim.api.nvim_command(cmd)
       end
-    end
-
-    if opts.insert then
-      vim.api.nvim_command [[ wincmd l]]
-      vim.api.nvim_command [[ startinsert ]]
     end
   end
 end

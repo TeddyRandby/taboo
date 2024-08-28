@@ -1,6 +1,7 @@
 -- main module file
 local module = require("taboo.module")
 local components = require("taboo.components")
+local ui = require("taboo.ui")
 
 ---@class TabooState
 ---@field bufnr integer
@@ -36,9 +37,9 @@ local config = {
   },
   settings = {
     new = { keep_on_close = true },
-    shell = { keep_on_close = true },
-    dapui = { keep_on_close = true },
-    lazygit = { keep_on_close = true },
+    shell = { keep_on_close = true, insert = true },
+    dapui = { keep_on_close = true, insert = true },
+    lazygit = { keep_on_close = true, insert = true },
   },
   launchers = {
     new = function(taboo, tid)
@@ -51,8 +52,8 @@ local config = {
       components.detatch(taboo, "new")
     end,
     dapui = function() require("dapui").open() end,
-    shell = module.launcher(M ,vim.o.shell, { insert = true, term = true }),
-    lazygit = module.launcher(M, "lazygit", { insert = true, term = true }),
+    shell = module.launcher(M, vim.o.shell, { term = true }),
+    lazygit = module.launcher(M, "lazygit", { term = true }),
   },
 }
 
@@ -60,14 +61,22 @@ M.config = config
 
 local autocmds = {
   {
+    "WinClosed",
+    function()
+      local numwins = #vim.api.nvim_tabpage_list_wins(0)
+      local tabpage = vim.api.nvim_get_current_tabpage()
+      if numwins == 2 and ui.haswinnr(M) and tabpage > 1 then
+        vim.api.nvim_command [[ tabclose ]]
+      end
+    end,
+  },
+  {
     "TabClosed",
-    function(args)
-      print(vim.inspect(args))
+    function()
       local tabnr = tonumber(vim.fn.expand("<afile>"))
       local cmpnr = module.find_tab(M, tabnr)
-      print(type(tabnr), tabnr, type(cmpnr), cmpnr)
       module.detatch(M, cmpnr)
-      if not M.setting(M, "keep_on_close", cmpnr) then
+      if not components.setting(M, "keep_on_close", cmpnr) then
         module.remove(M, cmpnr)
       end
     end,
@@ -89,18 +98,6 @@ function M.setup(args)
       callback = v[2],
     })
   end
-end
-
----Get a given setting for the given component
----@param taboo TabooState
----@param setting string
----@param cmpnr string | integer | nil
----@return any
-function M.setting(taboo, setting, cmpnr)
-  local component = components.component(taboo, cmpnr)
-  local settings = taboo.config.settings[component] or {}
-  print(component, vim.inspect(settings))
-  return settings[setting]
 end
 
 ---Open the taboo ui
