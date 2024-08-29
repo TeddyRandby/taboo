@@ -57,7 +57,7 @@ function M.bufnr(taboo, bufnr)
   return bufnr
 end
 
----Get the tab at the tabnr
+---Get or set the tab at the tabnr
 ---@param taboo TabooState
 ---@param tabnr integer
 ---@param tab TabooTab?
@@ -230,7 +230,7 @@ function M.bufsetup(taboo, bufnr)
     return
   end
 
-  vim.api.nvim_buf_set_name(bufnr, "taboo" .. tostring(bufnr))
+  vim.api.nvim_buf_set_name(bufnr, "taboo")
 
   for k, v in pairs(M.bufopts) do
     vim.api.nvim_set_option_value(k, v, {

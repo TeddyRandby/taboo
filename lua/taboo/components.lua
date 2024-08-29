@@ -124,19 +124,23 @@ end
 
 ---Detatch a component from its tab, but leave the tab open
 ---@param taboo TabooState
----@param cmp string | integer | nil
-function M.detatch(taboo, cmp)
-  if cmp == nil then
-    cmp = 0
+---@param cmpnr string | integer | nil
+function M.detatch(taboo, cmpnr)
+  if cmpnr == nil then
+    cmpnr = 0
   end
 
-  if type(cmp) == "string" then
-    cmp = M.find(taboo, cmp)
+  if type(cmpnr) == "string" then
+    cmpnr = M.find(taboo, cmpnr)
   end
 
-  assert(cmp > 0 and cmp <= #M.components, "No component found: " .. cmp)
+  if cmpnr == 0 then
+    cmpnr = taboo.selected
+  end
 
-  M.tabpages[cmp] = -1
+  assert(cmpnr >= 0 and cmpnr <= #M.components, "No component found: " .. cmpnr)
+
+  M.tabpages[cmpnr] = -1
 end
 
 ---Get a given setting for the given component

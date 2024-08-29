@@ -124,8 +124,6 @@ function M.select(taboo, cmpnr, opts)
     cmpnr = #components.components
   end
 
-  local enter = taboo.selected == cmpnr
-
   taboo.selected = cmpnr
 
   local tid = components.tabnr(taboo, 0)

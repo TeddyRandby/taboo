@@ -1,7 +1,6 @@
 -- main module file
 local module = require("taboo.module")
 local components = require("taboo.components")
-local ui = require("taboo.ui")
 
 ---@class TabooState
 ---@field bufnr integer
@@ -15,7 +14,7 @@ local M = {
 }
 
 ---@class TabooComponentSettings
----@field keep_on_close boolean
+---@field insert boolean
 
 ---@class TabooConfig
 ---@field components string[]
@@ -36,21 +35,21 @@ local config = {
     lazygit = "",
   },
   settings = {
-    new = { keep_on_close = true },
-    shell = { keep_on_close = true, insert = true },
-    dapui = { keep_on_close = true, insert = true },
-    lazygit = { keep_on_close = true, insert = true },
+    shell = { insert = true },
+    dapui = { insert = true },
+    lazygit = { insert = true },
   },
   launchers = {
-    new = function(taboo, tid)
+    new = function(taboo, tabnr)
       module.append(taboo, {
-        -- launcher = module.launcher(M, function() end),
-        name = tostring(tid),
-        icon = tostring(tid),
-        tabnr = tid,
+        name = tostring(tabnr),
+        icon = tostring(tabnr),
+        tabnr = tabnr,
       })
 
       components.detatch(taboo, "new")
+
+      module.select(taboo, components.find_tab(taboo, tabnr))
     end,
     dapui = function() require("dapui").open() end,
     shell = module.launcher(M, vim.o.shell, { term = true }),
