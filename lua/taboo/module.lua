@@ -105,8 +105,8 @@ function M.launch(taboo, target)
 end
 
 ---@class TabooSelect
+---@field skip boolean?
 ---@field preview boolean?
----@field enter boolean?
 
 ---Select the component at index 'i'
 ---This is 1-based, and will clamp to within the bounds of the component table.
@@ -151,12 +151,11 @@ end
 
 ---Select the next component
 ---@param taboo TabooState
----@param skip boolean?
 ---@param opts TabooSelect?
-function M.next(taboo, skip, opts)
+function M.next(taboo, opts)
   M.select(taboo, taboo.selected + 1, opts)
 
-  if skip then
+  if opts and opts.skip then
     local starting_point = taboo.selected
 
     while not components.hastabnr(taboo, 0) do
@@ -171,12 +170,11 @@ end
 
 ---Select the previous component
 ---@param taboo TabooState
----@param skip boolean?
 ---@param opts TabooSelect?
-function M.prev(taboo, skip, opts)
+function M.prev(taboo, opts)
   M.select(taboo, taboo.selected - 1, opts)
 
-  if skip then
+  if opts and opts.skip then
     local starting_point = taboo.selected
 
     while not components.hastabnr(taboo, 0) do

@@ -17,12 +17,12 @@ end
 
 vim.api.nvim_create_user_command("TabooNext", function(args)
   local opts = table_from_flags(args.fargs)
-  require("taboo").next(opts.skip, opts)
+  require("taboo").next(opts)
 end, { nargs = '*' })
 
 vim.api.nvim_create_user_command("TabooPrev", function(args)
   local opts = table_from_flags(args.fargs)
-  require("taboo").prev(opts.skip, opts)
+  require("taboo").prev(opts)
 end, { nargs = '*' })
 
 vim.api.nvim_create_user_command("TabooLaunch", function(args)

@@ -81,17 +81,15 @@ function M.close()
 end
 
 ---Select the next tab
----@param skip boolean?
 ---@param opts TabooSelect?
-function M.next(skip, opts)
-  module.next(M, skip, opts)
+function M.next(opts)
+  module.next(M, opts)
 end
 
 ---Select the previous tab
----@param skip boolean?
 ---@param opts TabooSelect?
-function M.prev(skip, opts)
-  module.prev(M, skip, opts)
+function M.prev(opts)
+  module.prev(M, opts)
 end
 
 ---Launch the component at target, or the selected one

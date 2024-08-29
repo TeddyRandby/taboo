@@ -1,6 +1,7 @@
 # T A B O O
 
-![Taboo Example](taboo.gif)
+![Taboo Example Image](taboo.png)
+![Taboo Example Usage](taboo.gif)
 
 Taboo is a neovim plugin for managing tabs. It is *very* experimental. The interface consists of a left-aligned column of icons, which are navigable.
 
@@ -57,3 +58,29 @@ local config = {
   },
 }
 ```
+
+# Commands
+### `TabooOpen`
+Open the taboo side-window
+### `TabooClose`
+Close the taboo side-window
+### `TabooFocus`
+Focus the taboo side-window
+### `TabooToggle`
+Toggle the taboo side-window
+### `TabooNext`
+Select the next component
+`TabooNext skip` will skip over components which don't have an active tab
+`TabooNext preview` will change to the selected components tab, if it exists
+### `TabooPrev`
+Select the previous component. Accepts the same arguments as `TabooNext`
+### `TabooLaunch`
+Launch a component. If 0 or nil is passed, the selected component is used.
+`TabooLaunch` will launch the selected component.
+`TabooLaunch lazygit` will launch the lazygit component.
+`TabooLaunch 2` will launch the second component.
+### `TabooRemove`
+Remove a component. This __removes the component from the list completely__.
+`TabooRemove` will remove the selected component.
+`TabooRemove lazygit` will remove the lazygit component.
+`TabooRemove 2` will remove the second component.
