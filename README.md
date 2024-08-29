@@ -75,12 +75,12 @@ Select the next component
 ### `TabooPrev`
 Select the previous component. Accepts the same arguments as `TabooNext`
 ### `TabooLaunch`
-Launch a component. If 0 or nil is passed, the selected component is used.
-`TabooLaunch` will launch the selected component.
-`TabooLaunch lazygit` will launch the lazygit component.
-`TabooLaunch 2` will launch the second component.
+Launch a component. If `0` or `nil` is passed, the selected component is used
+- `TabooLaunch` will launch the selected component
+- `TabooLaunch lazygit` will launch the lazygit component
+- `TabooLaunch 2` will launch the second component
 ### `TabooRemove`
-Remove a component. This __removes the component from the list completely__.
-`TabooRemove` will remove the selected component.
-`TabooRemove lazygit` will remove the lazygit component.
-`TabooRemove 2` will remove the second component.
+Remove a component. This __removes the component from the list completely__
+- `TabooRemove` will remove the selected component
+- `TabooRemove lazygit` will remove the lazygit component
+- `TabooRemove 2` will remove the second component
