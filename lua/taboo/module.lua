@@ -134,7 +134,7 @@ function M.select(taboo, cmpnr, opts)
   M.focus(taboo)
 
   if opts.preview and components.hastabnr(taboo, 0) and ui.haswinnr(taboo, tid) then
-    components.launch(taboo, 0, not (opts.enter or enter))
+    components.launch(taboo, 0)
     components.focus(taboo, cmpnr, true)
   end
 end
@@ -219,6 +219,7 @@ end
 ---@param cmp string | integer | nil
 function M.remove(taboo, cmp)
   local result = components.remove(taboo, cmp)
+
   if result then
     if #components.components == 0 then
       M.close(taboo)

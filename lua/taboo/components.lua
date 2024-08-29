@@ -173,8 +173,7 @@ end
 ---Launch the component at the given cmpnr
 ---@param taboo TabooState
 ---@param cmpnr integer
----@param preview? boolean
-function M.launch(taboo, cmpnr, preview)
+function M.launch(taboo, cmpnr)
   if cmpnr == 0 then
     cmpnr = taboo.selected
   end
@@ -188,11 +187,6 @@ function M.launch(taboo, cmpnr, preview)
   if not M.hastabnr(taboo, cmpnr) then
     local launcher = taboo.config.launchers[cmp]
 
-    if not launcher then
-      vim.notify("No launcher found for " .. cmp, vim.log.levels.WARN)
-      return
-    end
-
     vim.api.nvim_command [[ tabnew ]]
 
     tabnr = vim.api.nvim_get_current_tabpage()
@@ -203,7 +197,9 @@ function M.launch(taboo, cmpnr, preview)
 
     M.tabpages[cmpnr] = tabnr
 
-    launcher(taboo, tabnr, tab)
+    if launcher then
+      launcher(taboo, tabnr, tab)
+    end
   end
 end
 

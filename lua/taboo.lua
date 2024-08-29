@@ -44,6 +44,7 @@ local config = {
   launchers = {
     new = function(taboo, tid)
       module.append(taboo, {
+        -- launcher = module.launcher(M, function() end),
         name = tostring(tid),
         icon = tostring(tid),
         tabnr = tid,
@@ -59,30 +60,6 @@ local config = {
 
 M.config = config
 
-local autocmds = {
-  {
-    "WinClosed",
-    function()
-      local numwins = #vim.api.nvim_tabpage_list_wins(0)
-      local tabpage = vim.api.nvim_get_current_tabpage()
-      if numwins == 2 and ui.haswinnr(M) and tabpage > 1 then
-        vim.api.nvim_command [[ tabclose ]]
-      end
-    end,
-  },
-  {
-    "TabClosed",
-    function()
-      local tabnr = tonumber(vim.fn.expand("<afile>"))
-      local cmpnr = module.find_tab(M, tabnr)
-      module.detatch(M, cmpnr)
-      if not components.setting(M, "keep_on_close", cmpnr) then
-        module.remove(M, cmpnr)
-      end
-    end,
-  },
-}
-
 
 ---Setup the plugin
 ---@param args TabooConfig?
@@ -91,12 +68,6 @@ function M.setup(args)
 
   for _, v in ipairs(M.config.components) do
     components.append(M, { name = v })
-  end
-
-  for _, v in ipairs(autocmds) do
-    vim.api.nvim_create_autocmd(v[1], {
-      callback = v[2],
-    })
   end
 end
 
